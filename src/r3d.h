@@ -57,24 +57,18 @@ typedef int64_t r3d_long;
 /** \struct r3d_rvec3 \brief A 3-vector.
  */
 typedef union {
-  struct
-  {
-    r3d_real x, /*!< \f$x\f$-component. */
+  r3d_real x, /*!< \f$x\f$-component. */
         y,      /*!< \f$y\f$-component. */
         z;      /*!< \f$z\f$-component. */
-  };
   r3d_real xyz[3]; /*!< Index-based access to components. */
 } r3d_rvec3;
 
 /** \struct r3d_dvec3 \brief An integer 3-vector for grid indexing.
  */
 typedef union {
-  struct
-  {
-    r3d_int i, /*!< \f$x\f$-component. */
-        j,     /*!< \f$y\f$-component. */
-        k;     /*!< \f$z\f$-component. */
-  };
+  r3d_int i, /*!< \f$x\f$-component. */
+      j,     /*!< \f$y\f$-component. */
+      k;     /*!< \f$z\f$-component. */
   r3d_int ijk[3]; /*!< Index-based access to components. */
 } r3d_dvec3;
 
