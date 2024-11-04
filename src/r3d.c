@@ -26,19 +26,19 @@
 // useful macros
 #define ONE_THIRD 0.333333333333333333333333333333333333333333333333333333
 #define ONE_SIXTH 0.16666666666666666666666666666666666666666666666666666667
-#define dot(va, vb) (va.x * vb.x + va.y * vb.y + va.z * vb.z)
+#define dot(va, vb) (va.values.x * vb.values.x + va.values.y * vb.values.y + va.values.z * vb.values.z)
 #define wav(va, wa, vb, wb, vr)								 \
 	{																						 \
-		vr.x = (wa * va.x + wb * vb.x) / (wa + wb); \
-		vr.y = (wa * va.y + wb * vb.y) / (wa + wb); \
-		vr.z = (wa * va.z + wb * vb.z) / (wa + wb); \
+		vr.values.x = (wa * va.values.x + wb * vb.values.x) / (wa + wb); \
+		vr.values.y = (wa * va.values.y + wb * vb.values.y) / (wa + wb); \
+		vr.values.z = (wa * va.values.z + wb * vb.values.z) / (wa + wb); \
 	}
 #define norm(v)												\
 	{																		\
 		r3d_real tmplen = sqrt(dot(v, v)); \
-		v.x /= (tmplen + 1.0e-299);				\
-		v.y /= (tmplen + 1.0e-299);				\
-		v.z /= (tmplen + 1.0e-299);				\
+		v.values.x /= (tmplen + 1.0e-299);				\
+		v.values.y /= (tmplen + 1.0e-299);				\
+		v.values.z /= (tmplen + 1.0e-299);				\
 	}
 
 int r3d_clip(r3d_poly *poly, r3d_plane *planes, r3d_int nplanes) {
@@ -299,9 +299,9 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 			v0 = vertbuffer[vcur].pos;
 
 #ifdef SHIFT_POLY
-			v0.x = v0.x - vc.x;
-			v0.y = v0.y - vc.y;
-			v0.z = v0.z - vc.z;
+			v0.values.x = v0.values.x - vc.values.x;
+			v0.values.y = v0.values.y - vc.values.y;
+			v0.values.z = v0.values.z - vc.values.z;
 #endif
 
 			// move to the second edge
@@ -318,16 +318,16 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 				v1 = vertbuffer[vnext].pos;
 
 #ifdef SHIFT_POLY
-				v2.x = v2.x - vc.x;
-				v2.y = v2.y - vc.y;
-				v2.z = v2.z - vc.z;
-				v1.x = v1.x - vc.x;
-				v1.y = v1.y - vc.y;
-				v1.z = v1.z - vc.z;
+				v2.values.x = v2.values.x - vc.values.x;
+				v2.values.y = v2.values.y - vc.values.y;
+				v2.values.z = v2.values.z - vc.values.z;
+				v1.values.x = v1.values.x - vc.values.x;
+				v1.values.y = v1.values.y - vc.values.y;
+				v1.values.z = v1.values.z - vc.values.z;
 #endif
 
-				sixv = (-v2.x * v1.y * v0.z + v1.x * v2.y * v0.z + v2.x * v0.y * v1.z -
-								v0.x * v2.y * v1.z - v1.x * v0.y * v2.z + v0.x * v1.y * v2.z);
+				sixv = (-v2.values.x * v1.values.y * v0.values.z + v1.values.x * v2.values.y * v0.values.z + v2.values.x * v0.values.y * v1.values.z -
+								v0.values.x * v2.values.y * v1.values.z - v1.values.x * v0.values.y * v2.values.z + v0.values.x * v1.values.y * v2.values.z);
 
 				// calculate the moments using the fast recursive method of Koehl (2012)
 				// essentially building a set of trinomial pyramids, one layer at a time
@@ -347,19 +347,19 @@ void r3d_reduce(r3d_poly *poly, r3d_real *moments, r3d_int polyorder) {
 							D[i][j][curlayer] = 0;
 							S[i][j][curlayer] = 0;
 							if (i > 0) {
-								C[i][j][curlayer] += v2.x * C[i - 1][j][prevlayer];
-								D[i][j][curlayer] += v1.x * D[i - 1][j][prevlayer];
-								S[i][j][curlayer] += v0.x * S[i - 1][j][prevlayer];
+								C[i][j][curlayer] += v2.values.x * C[i - 1][j][prevlayer];
+								D[i][j][curlayer] += v1.values.x * D[i - 1][j][prevlayer];
+								S[i][j][curlayer] += v0.values.x * S[i - 1][j][prevlayer];
 							}
 							if (j > 0) {
-								C[i][j][curlayer] += v2.y * C[i][j - 1][prevlayer];
-								D[i][j][curlayer] += v1.y * D[i][j - 1][prevlayer];
-								S[i][j][curlayer] += v0.y * S[i][j - 1][prevlayer];
+								C[i][j][curlayer] += v2.values.y * C[i][j - 1][prevlayer];
+								D[i][j][curlayer] += v1.values.y * D[i][j - 1][prevlayer];
+								S[i][j][curlayer] += v0.values.y * S[i][j - 1][prevlayer];
 							}
 							if (k > 0) {
-								C[i][j][curlayer] += v2.z * C[i][j][prevlayer];
-								D[i][j][curlayer] += v1.z * D[i][j][prevlayer];
-								S[i][j][curlayer] += v0.z * S[i][j][prevlayer];
+								C[i][j][curlayer] += v2.values.z * C[i][j][prevlayer];
+								D[i][j][curlayer] += v1.values.z * D[i][j][prevlayer];
+								S[i][j][curlayer] += v0.values.z * S[i][j][prevlayer];
 							}
 							D[i][j][curlayer] += C[i][j][curlayer];
 							S[i][j][curlayer] += D[i][j][curlayer];
@@ -436,8 +436,8 @@ void r3d_shift_moments(r3d_real* moments, r3d_int polyorder, r3d_rvec3 vc) {
 						for (mj = mcorder - mi; mj >= 0; --mj, ++mm) {
 							mk = mcorder - mi - mj;
 							if (mi <= i && mj <= j && mk <= k ) {
-								moments2[m] += B[mi][i] * B[mj][j] * B[mk][k] *	pow(vc.x,(i-mi)) *
-										pow(vc.y,(j-mj)) * pow(vc.z,(k-mk)) * moments[mm];
+								moments2[m] += B[mi][i] * B[mj][j] * B[mk][k] *	pow(vc.values.x,(i-mi)) *
+										pow(vc.values.y,(j-mj)) * pow(vc.values.z,(k-mk)) * moments[mm];
 							}
 						}
 				}
@@ -459,17 +459,17 @@ r3d_rvec3 r3d_poly_center(r3d_poly* poly) {
 	r3d_vertex* vertbuffer = poly->verts;
 	r3d_int* nverts = &poly->nverts;
 
-	vc.x = 0.0;
-	vc.y = 0.0;
-	vc.z = 0.0;
+	vc.values.x = 0.0;
+	vc.values.y = 0.0;
+	vc.values.z = 0.0;
 	for(vcur = 0; vcur < *nverts; ++vcur) {
-		vc.x += vertbuffer[vcur].pos.x;
-		vc.y += vertbuffer[vcur].pos.y;
-		vc.z += vertbuffer[vcur].pos.z;
+		vc.values.x += vertbuffer[vcur].pos.values.x;
+		vc.values.y += vertbuffer[vcur].pos.values.y;
+		vc.values.z += vertbuffer[vcur].pos.values.z;
 	}
-	vc.x /= *nverts;
-	vc.y /= *nverts;
-	vc.z /= *nverts;
+	vc.values.x /= *nverts;
+	vc.values.y /= *nverts;
+	vc.values.z /= *nverts;
 
 	return vc;
 }
@@ -597,18 +597,18 @@ void r3d_rotate(r3d_poly *poly, r3d_real theta, r3d_int axis) {
 void r3d_translate(r3d_poly *poly, r3d_rvec3 shift) {
 	r3d_int v;
 	for (v = 0; v < poly->nverts; ++v) {
-		poly->verts[v].pos.x += shift.x;
-		poly->verts[v].pos.y += shift.y;
-		poly->verts[v].pos.z += shift.z;
+		poly->verts[v].pos.values.x += shift.values.x;
+		poly->verts[v].pos.values.y += shift.values.y;
+		poly->verts[v].pos.values.z += shift.values.z;
 	}
 }
 
 void r3d_scale(r3d_poly *poly, r3d_real scale) {
 	r3d_int v;
 	for (v = 0; v < poly->nverts; ++v) {
-		poly->verts[v].pos.x *= scale;
-		poly->verts[v].pos.y *= scale;
-		poly->verts[v].pos.z *= scale;
+		poly->verts[v].pos.values.x *= scale;
+		poly->verts[v].pos.values.y *= scale;
+		poly->verts[v].pos.values.z *= scale;
 	}
 }
 
@@ -627,18 +627,18 @@ void r3d_affine(r3d_poly *poly, r3d_real mat[4][4]) {
 		tmp = poly->verts[v].pos;
 
 		// affine transformation
-		poly->verts[v].pos.x =
-				tmp.x * mat[0][0] + tmp.y * mat[0][1] + tmp.z * mat[0][2] + mat[0][3];
-		poly->verts[v].pos.y =
-				tmp.x * mat[1][0] + tmp.y * mat[1][1] + tmp.z * mat[1][2] + mat[1][3];
-		poly->verts[v].pos.z =
-				tmp.x * mat[2][0] + tmp.y * mat[2][1] + tmp.z * mat[2][2] + mat[2][3];
-		w = tmp.x * mat[3][0] + tmp.y * mat[3][1] + tmp.z * mat[3][2] + mat[3][3];
+		poly->verts[v].pos.values.x =
+				tmp.values.x * mat[0][0] + tmp.values.y * mat[0][1] + tmp.values.z * mat[0][2] + mat[0][3];
+		poly->verts[v].pos.values.y =
+				tmp.values.x * mat[1][0] + tmp.values.y * mat[1][1] + tmp.values.z * mat[1][2] + mat[1][3];
+		poly->verts[v].pos.values.z =
+				tmp.values.x * mat[2][0] + tmp.values.y * mat[2][1] + tmp.values.z * mat[2][2] + mat[2][3];
+		w = tmp.values.x * mat[3][0] + tmp.values.y * mat[3][1] + tmp.values.z * mat[3][2] + mat[3][3];
 
 		// homogeneous divide if w != 1, i.e. in a perspective projection
-		poly->verts[v].pos.x /= w;
-		poly->verts[v].pos.y /= w;
-		poly->verts[v].pos.z /= w;
+		poly->verts[v].pos.values.x /= w;
+		poly->verts[v].pos.values.y /= w;
+		poly->verts[v].pos.values.z /= w;
 	}
 }
 
@@ -697,30 +697,30 @@ void r3d_init_box(r3d_poly *poly, r3d_rvec3 rbounds[2]) {
 	vertbuffer[7].pnbrs[0] = 6;
 	vertbuffer[7].pnbrs[1] = 3;
 	vertbuffer[7].pnbrs[2] = 4;
-	vertbuffer[0].pos.x = rbounds[0].x;
-	vertbuffer[0].pos.y = rbounds[0].y;
-	vertbuffer[0].pos.z = rbounds[0].z;
-	vertbuffer[1].pos.x = rbounds[1].x;
-	vertbuffer[1].pos.y = rbounds[0].y;
-	vertbuffer[1].pos.z = rbounds[0].z;
-	vertbuffer[2].pos.x = rbounds[1].x;
-	vertbuffer[2].pos.y = rbounds[1].y;
-	vertbuffer[2].pos.z = rbounds[0].z;
-	vertbuffer[3].pos.x = rbounds[0].x;
-	vertbuffer[3].pos.y = rbounds[1].y;
-	vertbuffer[3].pos.z = rbounds[0].z;
-	vertbuffer[4].pos.x = rbounds[0].x;
-	vertbuffer[4].pos.y = rbounds[0].y;
-	vertbuffer[4].pos.z = rbounds[1].z;
-	vertbuffer[5].pos.x = rbounds[1].x;
-	vertbuffer[5].pos.y = rbounds[0].y;
-	vertbuffer[5].pos.z = rbounds[1].z;
-	vertbuffer[6].pos.x = rbounds[1].x;
-	vertbuffer[6].pos.y = rbounds[1].y;
-	vertbuffer[6].pos.z = rbounds[1].z;
-	vertbuffer[7].pos.x = rbounds[0].x;
-	vertbuffer[7].pos.y = rbounds[1].y;
-	vertbuffer[7].pos.z = rbounds[1].z;
+	vertbuffer[0].pos.values.x = rbounds[0].values.x;
+	vertbuffer[0].pos.values.y = rbounds[0].values.y;
+	vertbuffer[0].pos.values.z = rbounds[0].values.z;
+	vertbuffer[1].pos.values.x = rbounds[1].values.x;
+	vertbuffer[1].pos.values.y = rbounds[0].values.y;
+	vertbuffer[1].pos.values.z = rbounds[0].values.z;
+	vertbuffer[2].pos.values.x = rbounds[1].values.x;
+	vertbuffer[2].pos.values.y = rbounds[1].values.y;
+	vertbuffer[2].pos.values.z = rbounds[0].values.z;
+	vertbuffer[3].pos.values.x = rbounds[0].values.x;
+	vertbuffer[3].pos.values.y = rbounds[1].values.y;
+	vertbuffer[3].pos.values.z = rbounds[0].values.z;
+	vertbuffer[4].pos.values.x = rbounds[0].values.x;
+	vertbuffer[4].pos.values.y = rbounds[0].values.y;
+	vertbuffer[4].pos.values.z = rbounds[1].values.z;
+	vertbuffer[5].pos.values.x = rbounds[1].values.x;
+	vertbuffer[5].pos.values.y = rbounds[0].values.y;
+	vertbuffer[5].pos.values.z = rbounds[1].values.z;
+	vertbuffer[6].pos.values.x = rbounds[1].values.x;
+	vertbuffer[6].pos.values.y = rbounds[1].values.y;
+	vertbuffer[6].pos.values.z = rbounds[1].values.z;
+	vertbuffer[7].pos.values.x = rbounds[0].values.x;
+	vertbuffer[7].pos.values.y = rbounds[1].values.y;
+	vertbuffer[7].pos.values.z = rbounds[1].values.z;
 }
 
 int r3d_init_poly(r3d_poly *poly, r3d_rvec3 *vertices, r3d_int numverts,
@@ -908,80 +908,80 @@ int r3d_init_poly(r3d_poly *poly, r3d_rvec3 *vertices, r3d_int numverts,
 
 void r3d_tet_faces_from_verts(r3d_plane *faces, r3d_rvec3 *verts) {
 	r3d_rvec3 tmpcent;
-	faces[0].n.x = ((verts[3].y - verts[1].y) * (verts[2].z - verts[1].z) -
-									(verts[2].y - verts[1].y) * (verts[3].z - verts[1].z));
-	faces[0].n.y = ((verts[2].x - verts[1].x) * (verts[3].z - verts[1].z) -
-									(verts[3].x - verts[1].x) * (verts[2].z - verts[1].z));
-	faces[0].n.z = ((verts[3].x - verts[1].x) * (verts[2].y - verts[1].y) -
-									(verts[2].x - verts[1].x) * (verts[3].y - verts[1].y));
+	faces[0].n.values.x = ((verts[3].values.y - verts[1].values.y) * (verts[2].values.z - verts[1].values.z) -
+									(verts[2].values.y - verts[1].values.y) * (verts[3].values.z - verts[1].values.z));
+	faces[0].n.values.y = ((verts[2].values.x - verts[1].values.x) * (verts[3].values.z - verts[1].values.z) -
+									(verts[3].values.x - verts[1].values.x) * (verts[2].values.z - verts[1].values.z));
+	faces[0].n.values.z = ((verts[3].values.x - verts[1].values.x) * (verts[2].values.y - verts[1].values.y) -
+									(verts[2].values.x - verts[1].values.x) * (verts[3].values.y - verts[1].values.y));
 	norm(faces[0].n);
-	tmpcent.x = ONE_THIRD * (verts[1].x + verts[2].x + verts[3].x);
-	tmpcent.y = ONE_THIRD * (verts[1].y + verts[2].y + verts[3].y);
-	tmpcent.z = ONE_THIRD * (verts[1].z + verts[2].z + verts[3].z);
+	tmpcent.values.x = ONE_THIRD * (verts[1].values.x + verts[2].values.x + verts[3].values.x);
+	tmpcent.values.y = ONE_THIRD * (verts[1].values.y + verts[2].values.y + verts[3].values.y);
+	tmpcent.values.z = ONE_THIRD * (verts[1].values.z + verts[2].values.z + verts[3].values.z);
 	faces[0].d = -dot(faces[0].n, tmpcent);
 
-	faces[1].n.x = ((verts[2].y - verts[0].y) * (verts[3].z - verts[2].z) -
-									(verts[2].y - verts[3].y) * (verts[0].z - verts[2].z));
-	faces[1].n.y = ((verts[3].x - verts[2].x) * (verts[2].z - verts[0].z) -
-									(verts[0].x - verts[2].x) * (verts[2].z - verts[3].z));
-	faces[1].n.z = ((verts[2].x - verts[0].x) * (verts[3].y - verts[2].y) -
-									(verts[2].x - verts[3].x) * (verts[0].y - verts[2].y));
+	faces[1].n.values.x = ((verts[2].values.y - verts[0].values.y) * (verts[3].values.z - verts[2].values.z) -
+									(verts[2].values.y - verts[3].values.y) * (verts[0].values.z - verts[2].values.z));
+	faces[1].n.values.y = ((verts[3].values.x - verts[2].values.x) * (verts[2].values.z - verts[0].values.z) -
+									(verts[0].values.x - verts[2].values.x) * (verts[2].values.z - verts[3].values.z));
+	faces[1].n.values.z = ((verts[2].values.x - verts[0].values.x) * (verts[3].values.y - verts[2].values.y) -
+									(verts[2].values.x - verts[3].values.x) * (verts[0].values.y - verts[2].values.y));
 	norm(faces[1].n);
-	tmpcent.x = ONE_THIRD * (verts[2].x + verts[3].x + verts[0].x);
-	tmpcent.y = ONE_THIRD * (verts[2].y + verts[3].y + verts[0].y);
-	tmpcent.z = ONE_THIRD * (verts[2].z + verts[3].z + verts[0].z);
+	tmpcent.values.x = ONE_THIRD * (verts[2].values.x + verts[3].values.x + verts[0].values.x);
+	tmpcent.values.y = ONE_THIRD * (verts[2].values.y + verts[3].values.y + verts[0].values.y);
+	tmpcent.values.z = ONE_THIRD * (verts[2].values.z + verts[3].values.z + verts[0].values.z);
 	faces[1].d = -dot(faces[1].n, tmpcent);
 
-	faces[2].n.x = ((verts[1].y - verts[3].y) * (verts[0].z - verts[3].z) -
-									(verts[0].y - verts[3].y) * (verts[1].z - verts[3].z));
-	faces[2].n.y = ((verts[0].x - verts[3].x) * (verts[1].z - verts[3].z) -
-									(verts[1].x - verts[3].x) * (verts[0].z - verts[3].z));
-	faces[2].n.z = ((verts[1].x - verts[3].x) * (verts[0].y - verts[3].y) -
-									(verts[0].x - verts[3].x) * (verts[1].y - verts[3].y));
+	faces[2].n.values.x = ((verts[1].values.y - verts[3].values.y) * (verts[0].values.z - verts[3].values.z) -
+									(verts[0].values.y - verts[3].values.y) * (verts[1].values.z - verts[3].values.z));
+	faces[2].n.values.y = ((verts[0].values.x - verts[3].values.x) * (verts[1].values.z - verts[3].values.z) -
+									(verts[1].values.x - verts[3].values.x) * (verts[0].values.z - verts[3].values.z));
+	faces[2].n.values.z = ((verts[1].values.x - verts[3].values.x) * (verts[0].values.y - verts[3].values.y) -
+									(verts[0].values.x - verts[3].values.x) * (verts[1].values.y - verts[3].values.y));
 	norm(faces[2].n);
-	tmpcent.x = ONE_THIRD * (verts[3].x + verts[0].x + verts[1].x);
-	tmpcent.y = ONE_THIRD * (verts[3].y + verts[0].y + verts[1].y);
-	tmpcent.z = ONE_THIRD * (verts[3].z + verts[0].z + verts[1].z);
+	tmpcent.values.x = ONE_THIRD * (verts[3].values.x + verts[0].values.x + verts[1].values.x);
+	tmpcent.values.y = ONE_THIRD * (verts[3].values.y + verts[0].values.y + verts[1].values.y);
+	tmpcent.values.z = ONE_THIRD * (verts[3].values.z + verts[0].values.z + verts[1].values.z);
 	faces[2].d = -dot(faces[2].n, tmpcent);
 
-	faces[3].n.x = ((verts[0].y - verts[2].y) * (verts[1].z - verts[0].z) -
-									(verts[0].y - verts[1].y) * (verts[2].z - verts[0].z));
-	faces[3].n.y = ((verts[1].x - verts[0].x) * (verts[0].z - verts[2].z) -
-									(verts[2].x - verts[0].x) * (verts[0].z - verts[1].z));
-	faces[3].n.z = ((verts[0].x - verts[2].x) * (verts[1].y - verts[0].y) -
-									(verts[0].x - verts[1].x) * (verts[2].y - verts[0].y));
+	faces[3].n.values.x = ((verts[0].values.y - verts[2].values.y) * (verts[1].values.z - verts[0].values.z) -
+									(verts[0].values.y - verts[1].values.y) * (verts[2].values.z - verts[0].values.z));
+	faces[3].n.values.y = ((verts[1].values.x - verts[0].values.x) * (verts[0].values.z - verts[2].values.z) -
+									(verts[2].values.x - verts[0].values.x) * (verts[0].values.z - verts[1].values.z));
+	faces[3].n.values.z = ((verts[0].values.x - verts[2].values.x) * (verts[1].values.y - verts[0].values.y) -
+									(verts[0].values.x - verts[1].values.x) * (verts[2].values.y - verts[0].values.y));
 	norm(faces[3].n);
-	tmpcent.x = ONE_THIRD * (verts[0].x + verts[1].x + verts[2].x);
-	tmpcent.y = ONE_THIRD * (verts[0].y + verts[1].y + verts[2].y);
-	tmpcent.z = ONE_THIRD * (verts[0].z + verts[1].z + verts[2].z);
+	tmpcent.values.x = ONE_THIRD * (verts[0].values.x + verts[1].values.x + verts[2].values.x);
+	tmpcent.values.y = ONE_THIRD * (verts[0].values.y + verts[1].values.y + verts[2].values.y);
+	tmpcent.values.z = ONE_THIRD * (verts[0].values.z + verts[1].values.z + verts[2].values.z);
 	faces[3].d = -dot(faces[3].n, tmpcent);
 }
 
 void r3d_box_faces_from_verts(r3d_plane *faces, r3d_rvec3 *rbounds) {
-	faces[0].n.x = 0.0;
-	faces[0].n.y = 0.0;
-	faces[0].n.z = 1.0;
-	faces[0].d = -rbounds[0].z;
-	faces[2].n.x = 0.0;
-	faces[2].n.y = 1.0;
-	faces[2].n.z = 0.0;
-	faces[2].d = -rbounds[0].y;
-	faces[4].n.x = 1.0;
-	faces[4].n.y = 0.0;
-	faces[4].n.z = 0.0;
-	faces[4].d = -rbounds[0].x;
-	faces[1].n.x = 0.0;
-	faces[1].n.y = 0.0;
-	faces[1].n.z = -1.0;
-	faces[1].d = rbounds[1].z;
-	faces[3].n.x = 0.0;
-	faces[3].n.y = -1.0;
-	faces[3].n.z = 0.0;
-	faces[3].d = rbounds[1].y;
-	faces[5].n.x = -1.0;
-	faces[5].n.y = 0.0;
-	faces[5].n.z = 0.0;
-	faces[5].d = rbounds[1].x;
+	faces[0].n.values.x = 0.0;
+	faces[0].n.values.y = 0.0;
+	faces[0].n.values.z = 1.0;
+	faces[0].d = -rbounds[0].values.z;
+	faces[2].n.values.x = 0.0;
+	faces[2].n.values.y = 1.0;
+	faces[2].n.values.z = 0.0;
+	faces[2].d = -rbounds[0].values.y;
+	faces[4].n.values.x = 1.0;
+	faces[4].n.values.y = 0.0;
+	faces[4].n.values.z = 0.0;
+	faces[4].d = -rbounds[0].values.x;
+	faces[1].n.values.x = 0.0;
+	faces[1].n.values.y = 0.0;
+	faces[1].n.values.z = -1.0;
+	faces[1].d = rbounds[1].values.z;
+	faces[3].n.values.x = 0.0;
+	faces[3].n.values.y = -1.0;
+	faces[3].n.values.z = 0.0;
+	faces[3].d = rbounds[1].values.y;
+	faces[5].n.values.x = -1.0;
+	faces[5].n.values.y = 0.0;
+	faces[5].n.values.z = 0.0;
+	faces[5].d = rbounds[1].values.x;
 }
 
 void r3d_poly_faces_from_verts(r3d_plane *faces, r3d_rvec3 *vertices,
@@ -993,35 +993,35 @@ void r3d_poly_faces_from_verts(r3d_plane *faces, r3d_rvec3 *vertices,
 
 	// calculate a centroid and a unit normal for each face
 	for (f = 0; f < numfaces; ++f) {
-		centroid.x = 0.0;
-		centroid.y = 0.0;
-		centroid.z = 0.0;
-		faces[f].n.x = 0.0;
-		faces[f].n.y = 0.0;
-		faces[f].n.z = 0.0;
+		centroid.values.x = 0.0;
+		centroid.values.y = 0.0;
+		centroid.values.z = 0.0;
+		faces[f].n.values.x = 0.0;
+		faces[f].n.values.y = 0.0;
+		faces[f].n.values.z = 0.0;
 
 		for (v = 0; v < numvertsperface[f]; ++v) {
 			// add cross product of edges to the total normal
 			p0 = vertices[faceinds[f][v]];
 			p1 = vertices[faceinds[f][(v + 1) % numvertsperface[f]]];
 			p2 = vertices[faceinds[f][(v + 2) % numvertsperface[f]]];
-			faces[f].n.x +=
-					(p1.y - p0.y) * (p2.z - p0.z) - (p1.z - p0.z) * (p2.y - p0.y);
-			faces[f].n.y +=
-					(p1.z - p0.z) * (p2.x - p0.x) - (p1.x - p0.x) * (p2.z - p0.z);
-			faces[f].n.z +=
-					(p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x);
+			faces[f].n.values.x +=
+					(p1.values.y - p0.values.y) * (p2.values.z - p0.values.z) - (p1.values.z - p0.values.z) * (p2.values.y - p0.values.y);
+			faces[f].n.values.y +=
+					(p1.values.z - p0.values.z) * (p2.values.x - p0.values.x) - (p1.values.x - p0.values.x) * (p2.values.z - p0.values.z);
+			faces[f].n.values.z +=
+					(p1.values.x - p0.values.x) * (p2.values.y - p0.values.y) - (p1.values.y - p0.values.y) * (p2.values.x - p0.values.x);
 
 			// add the vertex position to the centroid
-			centroid.x += p0.x;
-			centroid.y += p0.y;
-			centroid.z += p0.z;
+			centroid.values.x += p0.values.x;
+			centroid.values.y += p0.values.y;
+			centroid.values.z += p0.values.z;
 		}
 
 		// normalize the normals and set the signed distance to origin
-		centroid.x /= numvertsperface[f];
-		centroid.y /= numvertsperface[f];
-		centroid.z /= numvertsperface[f];
+		centroid.values.x /= numvertsperface[f];
+		centroid.values.y /= numvertsperface[f];
+		centroid.values.z /= numvertsperface[f];
 		norm(faces[f].n);
 		faces[f].d = -dot(faces[f].n, centroid);
 	}
@@ -1031,15 +1031,15 @@ r3d_real r3d_orient(r3d_rvec3 *verts) {
 	r3d_real adx, bdx, cdx;
 	r3d_real ady, bdy, cdy;
 	r3d_real adz, bdz, cdz;
-	adx = verts[0].x - verts[3].x;
-	bdx = verts[1].x - verts[3].x;
-	cdx = verts[2].x - verts[3].x;
-	ady = verts[0].y - verts[3].y;
-	bdy = verts[1].y - verts[3].y;
-	cdy = verts[2].y - verts[3].y;
-	adz = verts[0].z - verts[3].z;
-	bdz = verts[1].z - verts[3].z;
-	cdz = verts[2].z - verts[3].z;
+	adx = verts[0].values.x - verts[3].values.x;
+	bdx = verts[1].values.x - verts[3].values.x;
+	cdx = verts[2].values.x - verts[3].values.x;
+	ady = verts[0].values.y - verts[3].values.y;
+	bdy = verts[1].values.y - verts[3].values.y;
+	cdy = verts[2].values.y - verts[3].values.y;
+	adz = verts[0].values.z - verts[3].values.z;
+	bdz = verts[1].values.z - verts[3].values.z;
+	cdz = verts[2].values.z - verts[3].values.z;
 	return -ONE_SIXTH *
 				 (adx * (bdy * cdz - bdz * cdy) + bdx * (cdy * adz - cdz * ady) +
 					cdx * (ady * bdz - adz * bdy));
@@ -1049,7 +1049,7 @@ void r3d_print(r3d_poly *poly) {
 	r3d_int v;
 	for (v = 0; v < poly->nverts; ++v) {
 		printf("	vertex %d: pos = ( %.10e , %.10e , %.10e ), nbrs = %d %d %d\n", v,
-					 poly->verts[v].pos.x, poly->verts[v].pos.y, poly->verts[v].pos.z,
+					 poly->verts[v].pos.values.x, poly->verts[v].pos.values.y, poly->verts[v].pos.values.z,
 					 poly->verts[v].pnbrs[0], poly->verts[v].pnbrs[1],
 					 poly->verts[v].pnbrs[2]);
 	}
@@ -1077,7 +1077,7 @@ void r3d_init_brep(r3d_poly *poly, r3d_brep **brep, r3d_int *numcomponents) {
 		r3d_rvec3 vxyz = vertbuffer[i].pos, vpxyz = vertbuffer[i - 1].pos;
 
 		// test if the vertex is coicident with the preceeding vertex
-		if (vxyz.x == vpxyz.x && vxyz.y == vpxyz.y && vxyz.z == vpxyz.z) {
+		if (vxyz.values.x == vpxyz.values.x && vxyz.values.y == vpxyz.values.y && vxyz.values.z == vpxyz.values.z) {
 			// this vertex is coincident with the preceeding
 			vertex_map[i] = vertex_map[i - 1];
 		} else {
@@ -1242,9 +1242,9 @@ void r3d_init_brep(r3d_poly *poly, r3d_brep **brep, r3d_int *numcomponents) {
 				component_map[i] = j;
 
 				// add the vertex coordinates
-				pbrep->vertices[j].x = vertbuffer[i].pos.x;
-				pbrep->vertices[j].y = vertbuffer[i].pos.y;
-				pbrep->vertices[j].z = vertbuffer[i].pos.z;
+				pbrep->vertices[j].values.x = vertbuffer[i].pos.values.x;
+				pbrep->vertices[j].values.y = vertbuffer[i].pos.values.y;
+				pbrep->vertices[j].values.z = vertbuffer[i].pos.values.z;
 				j++;
 			}
 		}
@@ -1308,8 +1308,8 @@ void r3d_print_brep(r3d_brep **brep, r3d_int numcomponents) {
 		printf("	component %d has %d vertices\n", c, (*brep)[c].numvertices);
 		for (v = 0; v < (*brep)[c].numvertices; ++v) {
 			printf("		vertex %2d: pos = ( % .10e , % .10e , % .10e )\n", v,
-                                                (*brep)[c].vertices[v].x, (*brep)[c].vertices[v].y,
-                                                (*brep)[c].vertices[v].z);
+                                                (*brep)[c].vertices[v].values.x, (*brep)[c].vertices[v].values.y,
+                                                (*brep)[c].vertices[v].values.z);
 		}
 
 		printf("\n\n	component %d has %d faces\n", c, (*brep)[c].numfaces);
